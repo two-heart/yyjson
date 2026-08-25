@@ -6442,7 +6442,10 @@ yyjson_doc *yyjson_read_fp(FILE *file,
             tmp = ((u8 *)buf) + buf_size - YYJSON_PADDING_SIZE - chunk_now;
             read_size = fread_safe(tmp, chunk_now, file);
             dat_size += read_size;
-            if (read_size != chunk_now) break;
+            if (read_size != chunk_now) {
+                if (ferror(file)) return_err(FILE_READ, MSG_FREAD);
+                break;
+            }
 
             chunk_now *= 2;
             if (chunk_now > chunk_max) chunk_now = chunk_max;
