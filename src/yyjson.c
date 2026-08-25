@@ -6563,6 +6563,9 @@ struct yyjson_incr_state {
     usize hdr_len; /* value count used by yyjson_doc */
     usize alc_len; /* value count allocated */
     usize ctn_len; /* the number of elements in current container */
+#if YYJSON_READER_DEPTH_LIMIT
+    u32 ctn_depth; /* current array/object depth */
+#endif
     yyjson_val *val_hdr; /* the head of allocated values */
     yyjson_val *val_end; /* the end of allocated values */
     yyjson_val *val; /* current JSON value */
@@ -6664,11 +6667,17 @@ yyjson_doc *yyjson_incr_read(yyjson_incr_state *state, size_t len,
 } while (false)
 
     /* save position where it's possible to resume incremental parsing */
+#if YYJSON_READER_DEPTH_LIMIT
+#define save_incr_depth() (state->ctn_depth = container_depth)
+#else
+#define save_incr_depth() ((void)0)
+#endif
 #define save_incr_state(_label) do { \
     state->label = LABEL_##_label; \
     state->cur = cur; \
     state->val = val; \
     state->ctn_len = ctn_len; \
+    save_incr_depth(); \
     state->hdr_len = hdr_len; \
     state->raw_ptr = raw_ptr; \
     if (unlikely(cur >= end)) goto unexpected_end; \
@@ -6730,6 +6739,9 @@ yyjson_doc *yyjson_incr_read(yyjson_incr_state *state, size_t len,
     flg = state->flg;
     alc = state->alc;
     ctn_len = state->ctn_len;
+#if YYJSON_READER_DEPTH_LIMIT
+    container_depth = state->ctn_depth;
+#endif
     hdr_len = state->hdr_len;
     alc_len = state->alc_len;
     val = state->val;
@@ -7156,6 +7168,7 @@ fail_depth:             return_err(cur, DEPTH, MSG_DEPTH);
 #undef return_err
 #undef return_err_inv_param
 #undef save_incr_state
+#undef save_incr_depth
 #undef check_maybe_truncated_number
 }
 
