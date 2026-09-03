@@ -2044,8 +2044,9 @@ yyjson_api_inline double yyjson_get_num(const yyjson_val *val);
     Returns NULL if `val` is NULL or type is not string. */
 yyjson_api_inline const char *yyjson_get_str(const yyjson_val *val);
 
-/** Returns the content length (string length, array size, object size).
-    Returns 0 if `val` is NULL or type is not string/array/object. */
+/** Returns the content length for raw/string/array/object values.
+    Returns 0 if `val` is NULL.
+    The return value is unspecified for other types. */
 yyjson_api_inline size_t yyjson_get_len(const yyjson_val *val);
 
 /** Returns whether the JSON value is equal to a string.
@@ -2649,8 +2650,9 @@ yyjson_api_inline double yyjson_mut_get_num(const yyjson_mut_val *val);
     Returns NULL if `val` is NULL or type is not string. */
 yyjson_api_inline const char *yyjson_mut_get_str(const yyjson_mut_val *val);
 
-/** Returns the content length (string length, array size, object size).
-    Returns 0 if `val` is NULL or type is not string/array/object. */
+/** Returns the content length for raw/string/array/object values.
+    Returns 0 if `val` is NULL.
+    The return value is unspecified for other types. */
 yyjson_api_inline size_t yyjson_mut_get_len(const yyjson_mut_val *val);
 
 /** Returns whether the JSON value is equal to a string.
